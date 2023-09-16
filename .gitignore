@@ -1,3 +1,4 @@
 /.out
 /demo
 /node_modules
+**/*.out
