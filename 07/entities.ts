@@ -9,7 +9,7 @@ export enum MemoryAccessCommand {
     NOT = 'not',
     EQ = 'eq',
     GT = 'gt',
-    LT = 'lt'
+    LT = 'lt',
 }
 
 export enum MemorySegment {
@@ -20,7 +20,7 @@ export enum MemorySegment {
     POINTER = 'pointer',
     TEMP = 'temp',
     CONSTANT = 'constant',
-    STATIC = 'static'
+    STATIC = 'static',
 }
 // ((10+45)-21) - (36+36) + 510
 export enum NamedMemory {
@@ -45,7 +45,7 @@ export enum NamedMemory {
     R15 = 15,
     // screen and keyboard
     SCREEN = 16384,
-    KBD = 24576
+    KBD = 24576,
 }
 
 export class VMCommand {
@@ -56,7 +56,14 @@ export class VMCommand {
     private _arg1: string | MemorySegment | undefined;
     private _arg2: number | undefined;
 
-    constructor(name: string, line: string, lineNum: number, command: MemoryAccessCommand, arg1?: string | MemorySegment, arg2?: number) {
+    constructor(
+        name: string,
+        line: string,
+        lineNum: number,
+        command: MemoryAccessCommand,
+        arg1?: string | MemorySegment,
+        arg2?: number
+    ) {
         this._name = name;
         this._line = line;
         this._lineNum = lineNum;

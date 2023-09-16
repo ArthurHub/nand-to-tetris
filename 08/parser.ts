@@ -1,4 +1,4 @@
-import { CommandType, MemorySegment, VMCommand } from "./entities.js";
+import { CommandType, MemorySegment, VMCommand } from './entities.js';
 
 /** The index of the first of 8 temp registers */
 const TEMP_REG_OFFSET = 5;
@@ -12,45 +12,22 @@ const SEGMENT_TO_SYMBOL = new Map<MemorySegment, string>([
 ]);
 
 /** push value in D register into the stack */
-const PUSH_D_TO_SP = [
-    '@SP',
-    'A=M',
-    'M=D',
-    '@SP',
-    'M=M+1'
-];
+const PUSH_D_TO_SP = ['@SP', 'A=M', 'M=D', '@SP', 'M=M+1'];
 
 /** push value in A register into the stack */
-const PUSH_A_TO_SP = [
-    'D=A',
-    ...PUSH_D_TO_SP
-];
+const PUSH_A_TO_SP = ['D=A', ...PUSH_D_TO_SP];
 
 /** read current M and push it into the stack */
-const PUSH_M_TO_SP = [
-    'D=M',
-    ...PUSH_D_TO_SP
-];
+const PUSH_M_TO_SP = ['D=M', ...PUSH_D_TO_SP];
 
 /** pop stack and put value in D reg */
-const POP_SP_TO_D = [
-    '@SP',
-    'M=M-1',
-    'A=M',
-    'D=M'
-];
+const POP_SP_TO_D = ['@SP', 'M=M-1', 'A=M', 'D=M'];
 
 /** Look at the top element on the stack. as M will read/write it */
-const TOP_SP = [
-    '@SP',
-    'A=M-1'
-];
+const TOP_SP = ['@SP', 'A=M-1'];
 
 /** Store the current value of D in temp register R13 */
-const STORE_D_IN_R13 = [
-    '@R13',
-    'M=D'
-]
+const STORE_D_IN_R13 = ['@R13', 'M=D'];
 
 export function getBootstrapLines(name: string): string[] {
     return [
@@ -77,7 +54,7 @@ export function getBootstrapLines(name: string): string[] {
         `(INFILOOP_${name})`,
         `@INFILOOP_${name}`,
         '0;JMP',
-        '// end bootstrap'
+        '// end bootstrap',
     ];
 }
 
@@ -85,7 +62,11 @@ export function getBootstrapLines(name: string): string[] {
  * Parse a single VM command text line into VMCommand object
  * @returns VMCommand object or undefined if the line is a comment
  */
-export function parseCommandLine(name: string, commandLine: string, lineNum: number): VMCommand | undefined {
+export function parseCommandLine(
+    name: string,
+    commandLine: string,
+    lineNum: number
+): VMCommand | undefined {
     commandLine = commandLine.trim();
     if (commandLine.length < 1 || commandLine.startsWith('//')) {
         return undefined;
@@ -100,9 +81,10 @@ export function parseCommandLine(name: string, commandLine: string, lineNum: num
 
     let arg1: number | string | undefined, arg2: number | undefined;
     if (commandParts.length === 3) {
-        arg1 = commandType === CommandType.PUSH || commandType === CommandType.POP
-            ? commandParts[1]! as MemorySegment
-            : commandParts[1]!;
+        arg1 =
+            commandType === CommandType.PUSH || commandType === CommandType.POP
+                ? (commandParts[1]! as MemorySegment)
+                : commandParts[1]!;
         arg2 = parseInt(commandParts[2]!);
     } else {
         arg1 = commandParts[1]! as string;
@@ -175,16 +157,13 @@ export function getAssemlyCode(command: VMCommand): string[] {
         default:
             throw new Error(`Invalid command at line ${command.lineNumber}: "${command.line}"`);
     }
-    return ["// " + command.line, ...lines];
+    return ['// ' + command.line, ...lines];
 }
 
 function getPushCommand(command: VMCommand): string[] {
     switch (command.arg1asMemorySegment) {
         case MemorySegment.CONSTANT:
-            return [
-                `@${command.arg2}`,
-                ...PUSH_A_TO_SP
-            ];
+            return [`@${command.arg2}`, ...PUSH_A_TO_SP];
         case MemorySegment.LOCAL:
         case MemorySegment.ARGUMENT:
         case MemorySegment.THIS:
@@ -194,23 +173,14 @@ function getPushCommand(command: VMCommand): string[] {
                 'D=A',
                 `@${SEGMENT_TO_SYMBOL.get(command.arg1asMemorySegment)}`,
                 'A=M+D',
-                ...PUSH_M_TO_SP
+                ...PUSH_M_TO_SP,
             ];
         case MemorySegment.TEMP:
-            return [
-                `@R${TEMP_REG_OFFSET + command.arg2!}`,
-                ...PUSH_M_TO_SP
-            ];
+            return [`@R${TEMP_REG_OFFSET + command.arg2!}`, ...PUSH_M_TO_SP];
         case MemorySegment.POINTER:
-            return [
-                command.arg2 === 0 ? "@THIS" : "@THAT",
-                ...PUSH_M_TO_SP
-            ];
+            return [command.arg2 === 0 ? '@THIS' : '@THAT', ...PUSH_M_TO_SP];
         case MemorySegment.STATIC:
-            return [
-                `@${command.name}.${command.arg2}`,
-                ...PUSH_M_TO_SP
-            ];
+            return [`@${command.name}.${command.arg2}`, ...PUSH_M_TO_SP];
         default:
             throw new Error(`Invalid command: ${command}`);
     }
@@ -231,44 +201,25 @@ function getPopCommand(command: VMCommand): string[] {
                 ...POP_SP_TO_D,
                 '@R13',
                 'A=M',
-                'M=D'
+                'M=D',
             ];
         case MemorySegment.TEMP:
-            return [
-                ...POP_SP_TO_D,
-                `@R${TEMP_REG_OFFSET + command.arg2!}`,
-                'M=D'
-            ];
+            return [...POP_SP_TO_D, `@R${TEMP_REG_OFFSET + command.arg2!}`, 'M=D'];
         case MemorySegment.POINTER:
-            return [
-                ...POP_SP_TO_D,
-                command.arg2 === 0 ? "@THIS" : "@THAT",
-                'M=D'
-            ];
+            return [...POP_SP_TO_D, command.arg2 === 0 ? '@THIS' : '@THAT', 'M=D'];
         case MemorySegment.STATIC:
-            return [
-                ...POP_SP_TO_D,
-                `@${command.name}.${command.arg2}`,
-                'M=D'
-            ];
+            return [...POP_SP_TO_D, `@${command.name}.${command.arg2}`, 'M=D'];
         default:
             throw new Error(`Invalid command: ${command}`);
     }
 }
 
 function getArithmeticUnaryCommand(op: string): string[] {
-    return [
-        ...TOP_SP,
-        `M=${op}`
-    ];
+    return [...TOP_SP, `M=${op}`];
 }
 
 function getArithmeticBinaryCommand(op: string): string[] {
-    return [
-        ...POP_SP_TO_D,
-        ...TOP_SP,
-        `M=${op}`
-    ];
+    return [...POP_SP_TO_D, ...TOP_SP, `M=${op}`];
 }
 
 function getBranchCommand(op: string, command: VMCommand): string[] {
@@ -295,24 +246,17 @@ function getLabelCommand(command: VMCommand): string[] {
 }
 
 function getGotoCommand(command: VMCommand): string[] {
-    return [
-        `@${command.name}_${command.arg1asString}`,
-        '0;JMP'
-    ];
+    return [`@${command.name}_${command.arg1asString}`, '0;JMP'];
 }
 
 function getIfGotoCommand(command: VMCommand): string[] {
-    return [
-        ...POP_SP_TO_D,
-        `@${command.name}_${command.arg1asString}`,
-        'D;JNE'
-    ];
+    return [...POP_SP_TO_D, `@${command.name}_${command.arg1asString}`, 'D;JNE'];
 }
 
 function getFunctionCommand(command: VMCommand): string[] {
     var lines = [
         // put label to call the function
-        `(FUNC_${command.arg1asString})`
+        `(FUNC_${command.arg1asString})`,
     ];
     if (command.arg2 > 0) {
         // init local variables to 0 and increment SP
@@ -358,7 +302,7 @@ function getCallCommand(command: VMCommand): string[] {
         `@FUNC_${command.arg1asString}`,
         '0;JMP',
         // add return label
-        `(${returnLabel})`
+        `(${returnLabel})`,
     ];
 }
 
@@ -405,7 +349,7 @@ function getReturnCommand(command: VMCommand): string[] {
         // jump to the return address stored in R15
         '@R15',
         'A=M',
-        '0;JMP'
+        '0;JMP',
     ];
     return lines;
 }

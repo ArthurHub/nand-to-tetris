@@ -3,7 +3,6 @@ import * as parser from './parser.js';
 import * as fs from 'fs';
 import * as readline from 'readline';
 
-
 const VM_EXT = '.vm';
 const ASEMBLY_EXT = '.asm';
 
@@ -33,7 +32,7 @@ export class Transpiler {
             if (command) {
                 const assemblyLines = parser.getAssemlyCode(command);
                 asmLines += assemblyLines.length;
-                assemblyLines.forEach(line => writter.write(line + '\n'));
+                assemblyLines.forEach((line) => writter.write(line + '\n'));
             }
         }
 

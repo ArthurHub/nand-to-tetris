@@ -8,7 +8,8 @@ export function getAllVmFiles(basePath: string): string[] {
 export function getAllFiles(basePath: string, ext: string): string[] {
     const extension = ext[0] === '.' ? ext : '.' + ext;
     const files: string[] = fs.readdirSync(basePath, { recursive: true, encoding: 'utf8' });
-    return files.filter((file: string) => path.extname(file) === extension)
+    return files
+        .filter((file: string) => path.extname(file) === extension)
         .map((file: string) => path.join(basePath, file));
 }
 

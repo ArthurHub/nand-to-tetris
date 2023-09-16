@@ -6,7 +6,6 @@ import * as utils from './utils.js';
 import { pipeline } from 'node:stream/promises';
 import { CommandType } from './entities.js';
 
-
 const VM_EXT = '.vm';
 const ASEMBLY_EXT = '.asm';
 
@@ -30,7 +29,7 @@ export class Transpiler {
             // write bootstrap
             const name = path.basename(this._outFilePath, ASEMBLY_EXT);
             const bootstrapLines = parser.getBootstrapLines(name);
-            bootstrapLines.forEach(line => writter.write(line + '\n'));
+            bootstrapLines.forEach((line) => writter.write(line + '\n'));
 
             // transpile all .vm files
             for (const vmFile of utils.getAllVmFiles(this._inFolderPath)) {
@@ -62,7 +61,11 @@ async function transpileFileStream(vmFilePath: string, writter: fs.WriteStream):
     return asmLines;
 }
 
-async function transpileFileImpl(fileName: string, reader: NodeJS.ReadableStream, writter: fs.WriteStream) {
+async function transpileFileImpl(
+    fileName: string,
+    reader: NodeJS.ReadableStream,
+    writter: fs.WriteStream
+) {
     let asmLines = 0;
     let vmLineNum = 0;
     let funcName: string;
@@ -72,7 +75,7 @@ async function transpileFileImpl(fileName: string, reader: NodeJS.ReadableStream
         if (command) {
             const assemblyLines = parser.getAssemlyCode(command);
             asmLines += assemblyLines.length;
-            assemblyLines.forEach(line => writter.write(line + '\n'));
+            assemblyLines.forEach((line) => writter.write(line + '\n'));
 
             // handle function name replacing file name for labels inside the function
             if (command.command === CommandType.FUNCTION) {
