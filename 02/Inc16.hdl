@@ -1,0 +1,49 @@
+// This file is part of www.nand2tetris.org
+// and the book "The Elements of Computing Systems"
+// by Nisan and Schocken, MIT Press.
+// File name: projects/02/Inc16.hdl
+
+/**
+ * 16-bit incrementer:
+ * out = in + 1 (arithmetic addition)
+ */
+
+CHIP Inc16 {
+    IN in[16];
+    OUT out[16];
+
+    PARTS:
+    
+    Not(in=in[0], out=out[0]);
+
+    Xor(a=in[1], b=in[0], out=out[1]);
+    And(a=in[1], b=in[0], out=c1);
+    
+    Xor(a=in[2], b=c1, out=out[2]);
+    And(a=in[2], b=c1, out=c2);
+    Xor(a=in[3], b=c2, out=out[3]);
+    And(a=in[3], b=c2, out=c3);
+    Xor(a=in[4], b=c3, out=out[4]);
+    And(a=in[4], b=c3, out=c4);
+    Xor(a=in[5], b=c4, out=out[5]);
+    And(a=in[5], b=c4, out=c5);
+    Xor(a=in[6], b=c5, out=out[6]);
+    And(a=in[6], b=c5, out=c6);
+    Xor(a=in[7], b=c6, out=out[7]);
+    And(a=in[7], b=c6, out=c7);
+    Xor(a=in[8], b=c7, out=out[8]);
+    And(a=in[8], b=c7, out=c8);
+    Xor(a=in[9], b=c8, out=out[9]);
+    And(a=in[9], b=c8, out=c9);
+    Xor(a=in[10], b=c9, out=out[10]);
+    And(a=in[10], b=c9, out=c10);
+    Xor(a=in[11], b=c10, out=out[11]);
+    And(a=in[11], b=c10, out=c11);
+    Xor(a=in[12], b=c11, out=out[12]);
+    And(a=in[12], b=c11, out=c12);
+    Xor(a=in[13], b=c12, out=out[13]);
+    And(a=in[13], b=c12, out=c13);
+    Xor(a=in[14], b=c13, out=out[14]);
+    And(a=in[14], b=c13, out=c14);
+    Xor(a=in[15], b=c14, out=out[15]);
+}
