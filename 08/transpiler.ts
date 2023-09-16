@@ -50,7 +50,7 @@ async function transpileFileStream(vmFilePath: string, writter: fs.WriteStream):
             reader,
             async function* (source: NodeJS.ReadableStream) {
                 const fileName = path.basename(vmFilePath, VM_EXT);
-                asmLines = await transpileFileImpl(fileName, source, writter);
+                yield (asmLines = await transpileFileImpl(fileName, source, writter));
             },
             writter,
             { end: false }
@@ -81,6 +81,7 @@ async function transpileFileImpl(
             if (command.command === CommandType.FUNCTION) {
                 funcName = `${fileName}_${command.arg1asString}`;
             } else if (command.command === CommandType.RETURN) {
+                // eslint-disable-next-line @typescript-eslint/no-unused-vars
                 funcName = undefined;
             }
         }

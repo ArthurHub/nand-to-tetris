@@ -152,7 +152,7 @@ export function getAssemlyCode(command: VMCommand): string[] {
             lines = getCallCommand(command);
             break;
         case CommandType.RETURN:
-            lines = getReturnCommand(command);
+            lines = getReturnCommand();
             break;
         default:
             throw new Error(`Invalid command at line ${command.lineNumber}: "${command.line}"`);
@@ -254,7 +254,7 @@ function getIfGotoCommand(command: VMCommand): string[] {
 }
 
 function getFunctionCommand(command: VMCommand): string[] {
-    var lines = [
+    let lines = [
         // put label to call the function
         `(FUNC_${command.arg1asString})`,
     ];
@@ -306,8 +306,8 @@ function getCallCommand(command: VMCommand): string[] {
     ];
 }
 
-function getReturnCommand(command: VMCommand): string[] {
-    let lines: string[] = [
+function getReturnCommand(): string[] {
+    return [
         // store return value in R13 to later push it to SP
         ...POP_SP_TO_D,
         ...STORE_D_IN_R13,
@@ -351,7 +351,6 @@ function getReturnCommand(command: VMCommand): string[] {
         'A=M',
         '0;JMP',
     ];
-    return lines;
 }
 
 function repeatLines(lines: string[], count: number): string[] {
