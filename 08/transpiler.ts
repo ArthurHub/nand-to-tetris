@@ -4,7 +4,6 @@ import * as fs from 'node:fs';
 import * as readline from 'readline';
 import * as utils from './utils.js';
 import { pipeline } from 'node:stream/promises';
-import { CommandType } from './entities.js';
 
 const VM_EXT = '.vm';
 const ASEMBLY_EXT = '.asm';
@@ -50,7 +49,8 @@ async function transpileFileStream(vmFilePath: string, writter: fs.WriteStream):
             reader,
             async function* (source: NodeJS.ReadableStream) {
                 const fileName = path.basename(vmFilePath, VM_EXT);
-                yield (asmLines = await transpileFileImpl(fileName, source, writter));
+                asmLines = await transpileFileImpl(fileName, source, writter);
+                yield '';
             },
             writter,
             { end: false }
@@ -68,7 +68,6 @@ async function transpileFileImpl(
 ) {
     let asmLines = 0;
     let vmLineNum = 0;
-    let funcName: string;
     const lineReader = readline.createInterface(reader);
     for await (const line of lineReader) {
         const command = parser.parseCommandLine(fileName, line, vmLineNum++);
@@ -76,14 +75,6 @@ async function transpileFileImpl(
             const assemblyLines = parser.getAssemlyCode(command);
             asmLines += assemblyLines.length;
             assemblyLines.forEach((line) => writter.write(line + '\n'));
-
-            // handle function name replacing file name for labels inside the function
-            if (command.command === CommandType.FUNCTION) {
-                funcName = `${fileName}_${command.arg1asString}`;
-            } else if (command.command === CommandType.RETURN) {
-                // eslint-disable-next-line @typescript-eslint/no-unused-vars
-                funcName = undefined;
-            }
         }
     }
     return asmLines;

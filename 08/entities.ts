@@ -55,54 +55,20 @@ export enum NamedMemory {
 }
 
 export class VMCommand {
-    private _name!: string;
-    private _line!: string;
-    private _lineNum!: number;
-    private _command!: CommandType;
-    private _arg1: string | MemorySegment | undefined;
-    private _arg2: number | undefined;
-
     constructor(
-        name: string,
-        line: string,
-        lineNum: number,
-        command: CommandType,
-        arg1?: string | MemorySegment,
-        arg2?: number
-    ) {
-        this._name = name;
-        this._line = line;
-        this._lineNum = lineNum;
-        this._command = command;
-        this._arg1 = arg1;
-        this._arg2 = arg2;
-    }
-
-    public get name(): string {
-        return this._name;
-    }
-
-    public get line(): string {
-        return this._line;
-    }
-
-    public get lineNumber(): number {
-        return this._lineNum;
-    }
-
-    public get command(): CommandType {
-        return this._command;
-    }
+        public readonly name: string,
+        public readonly line: string,
+        public readonly lineNumber: number,
+        public readonly command: CommandType,
+        public readonly arg1?: string | MemorySegment | undefined,
+        public readonly arg2?: number
+    ) {}
 
     public get arg1asMemorySegment(): MemorySegment {
-        return this._arg1 as MemorySegment;
+        return this.arg1 as MemorySegment;
     }
 
     public get arg1asString(): string {
-        return this._arg1 as string;
-    }
-
-    public get arg2(): number | undefined {
-        return this._arg2;
+        return this.arg1 as string;
     }
 }
